@@ -1,0 +1,9 @@
+QUARTUS_VERSION = "13.0"
+DATE = "2026/11/10 21:00:00"
+
+# Proyecto: MPDII - Microprocesador didactico de 8 bits
+# Revision unica del proyecto.
+
+QUARTUS_VERSION = "13.0"
+
+PROJECT_REVISION = "MPDII"

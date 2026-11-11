@@ -1,0 +1,89 @@
+#==============================================================================
+# Proyecto : MPDII - Microprocesador didactico de 8 bits
+# Archivo  : MPDII.qsf  (asignaciones del proyecto para Quartus II)
+#==============================================================================
+# Dispositivo por defecto: Cyclone II EP2C35F672C6 (tarjeta Altera DE2).
+# Si usas otra tarjeta, cambia FAMILY y DEVICE y vuelve a asignar los pines
+# de la seccion final.
+#==============================================================================
+
+set_global_assignment -name FAMILY "Cyclone II"
+set_global_assignment -name DEVICE EP2C35F672C6
+set_global_assignment -name TOP_LEVEL_ENTITY MPDII
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "21:00:00 NOVEMBER 10, 2026"
+set_global_assignment -name LAST_QUARTUS_VERSION 13.0
+
+set_global_assignment -name VHDL_INPUT_VERSION VHDL93
+set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
+
+#------------------------------------------------------------------------------
+# Archivos fuente
+#  Orden recomendado: primero las hojas, luego los bloques, al final el TOP.
+#------------------------------------------------------------------------------
+# --- Combinacionales (flujo de datos) ---
+set_global_assignment -name VHDL_FILE rtl/mux2to1_8.vhd
+set_global_assignment -name VHDL_FILE rtl/mux4to1_8.vhd
+set_global_assignment -name VHDL_FILE rtl/inc8.vhd
+set_global_assignment -name VHDL_FILE rtl/alu8.vhd
+set_global_assignment -name VHDL_FILE rtl/shifter8.vhd
+set_global_assignment -name VHDL_FILE rtl/tristate8.vhd
+set_global_assignment -name VHDL_FILE rtl/flags.vhd
+set_global_assignment -name VHDL_FILE rtl/rom256x13.vhd
+
+# --- Secuenciales (comportamiento) ---
+set_global_assignment -name VHDL_FILE rtl/reg8.vhd
+set_global_assignment -name VHDL_FILE rtl/reg13.vhd
+set_global_assignment -name VHDL_FILE rtl/regfile16x8.vhd
+
+# --- Unidades y TOP ---
+set_global_assignment -name VHDL_FILE rtl/datapath.vhd
+set_global_assignment -name VHDL_FILE rtl/control_unit.vhd
+set_global_assignment -name VHDL_FILE rtl/MPDII.vhd
+
+# --- Banco de pruebas (solo simulacion, no se sintetiza) ---
+set_global_assignment -name VHDL_TEST_BENCH_FILE sim/tb_MPDII.vhd
+
+#------------------------------------------------------------------------------
+# Simulacion con ModelSim-Altera
+#------------------------------------------------------------------------------
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
+set_global_assignment -name EDA_TIME_SCALE "1 ns" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH tb_MPDII -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME tb_MPDII -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_MPDII
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_MPDII -section_id tb_MPDII
+set_global_assignment -name EDA_TEST_BENCH_FILE sim/tb_MPDII.vhd -section_id tb_MPDII
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "6 us" -section_id tb_MPDII
+
+#------------------------------------------------------------------------------
+# Asignacion de pines (tarjeta DE2 - ajustar segun la tarjeta disponible)
+#   clk      -> PIN_N2   oscilador de 50 MHz
+#   reset    -> PIN_G26  pulsador KEY[0] (activo en alto: invertir si hace falta)
+#   Input_dp -> SW[7..0]
+#   OUT_dp   -> LEDR[7..0]
+#------------------------------------------------------------------------------
+set_location_assignment PIN_N2  -to clk
+set_location_assignment PIN_G26 -to reset
+
+set_location_assignment PIN_N25 -to Input_dp[0]
+set_location_assignment PIN_N26 -to Input_dp[1]
+set_location_assignment PIN_P25 -to Input_dp[2]
+set_location_assignment PIN_AE14 -to Input_dp[3]
+set_location_assignment PIN_AF14 -to Input_dp[4]
+set_location_assignment PIN_AD13 -to Input_dp[5]
+set_location_assignment PIN_AC13 -to Input_dp[6]
+set_location_assignment PIN_C13 -to Input_dp[7]
+
+set_location_assignment PIN_AE23 -to OUT_dp[0]
+set_location_assignment PIN_AF23 -to OUT_dp[1]
+set_location_assignment PIN_AB21 -to OUT_dp[2]
+set_location_assignment PIN_AC22 -to OUT_dp[3]
+set_location_assignment PIN_AD22 -to OUT_dp[4]
+set_location_assignment PIN_AD23 -to OUT_dp[5]
+set_location_assignment PIN_AD21 -to OUT_dp[6]
+set_location_assignment PIN_AC21 -to OUT_dp[7]
+
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
