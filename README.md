@@ -192,6 +192,58 @@ En t = 3810 ns el procesador ejecuta `OUT` y entrega **`OUT_dp = 0x05`**.
 
 ---
 
+## Señales de observación (`TEST_*`)
+
+La entidad `MPDII` expone diez puertos de solo observación para seguir el
+movimiento de los datos dentro del procesador. No alimentan ninguna lógica, así
+que pueden dejarse sin conectar sin alterar el funcionamiento.
+
+| Señal | Bits | Qué deja ver |
+|---|---|---|
+| `TEST_PC` | 8 | dirección de la instrucción que se está buscando |
+| `TEST_ROM` | 13 | palabra de instrucción que entrega la ROM |
+| `TEST_COP` | 5 | código de operación que decodifica la unidad de control |
+| `TEST_Mux_dp` | 8 | dato que circula por el BUS Y |
+| `TEST_Acc` | 8 | contenido del acumulador (entrada A de la ALU) |
+| `TEST_RF` | 8 | registro seleccionado por `RF_Addr` (entrada B de la ALU) |
+| `TEST_ALU` | 8 | resultado aritmético-lógico antes de desplazar |
+| `TEST_Shifter` | 8 | resultado después del desplazador |
+| `TEST_Zero_dp` | 1 | bandera de cero, gobierna `JZ` y `JNZ` |
+| `TEST_OUT_En` | 1 | ciclo exacto en que `OUT_dp` es válido |
+
+Siete salen de nodos internos de la unidad de datos; tres son copias de señales
+que ya cruzaban entre las dos unidades. El banco de pruebas las usa para
+imprimir una traza legible:
+
+```
+@531ns   PCsig=8   ADD  BusY=15  -> Acc=15  | RF=15  ALU=15  Shift=15  Zero='0'
+@591ns   PCsig=9   SUB  BusY=12  -> Acc=12  | RF=3   ALU=12  Shift=12  Zero='0'
+@3591ns  PCsig=9   SUB  BusY=253 -> Acc=253 | RF=3   ALU=253 Shift=253 Zero='0'
+@3830ns  >>> OUT_dp = 5   (TEST_OUT_En activa)
+```
+
+`PCsig` es la dirección **siguiente**: el PC se incrementa durante la búsqueda,
+antes de ejecutar.
+
+Los diez puertos suman 68 bits y llevan el total a 86 pines. Caben en el MAX 10
+10M08, pero no en los pines accesibles de una DE10-Lite: para hardware conviene
+elegir un subconjunto o usar SignalTap.
+
+---
+
+## Dispositivo
+
+El `MPDII.qsf` original apunta a Cyclone II (DE2). Para MAX 10 `10M08DAF484C8G`
+(DE10-Lite) usa `MPDII_max10.qsf`: renómbralo a `MPDII.qsf` reemplazando el
+anterior. Trae los pines comentados para que la compilación llegue hasta el
+final; descoméntalos tras verificarlos contra el manual de tu tarjeta.
+
+**Atención al reset:** los pulsadores `KEY` de la DE10-Lite son activos en bajo
+y el puerto `reset` del MPDII es activo en alto. Conectarlo directo a `KEY0`
+deja el procesador permanentemente en reset.
+
+---
+
 ## Simulación
 
 ### Con ModelSim-Altera (desde Quartus II)

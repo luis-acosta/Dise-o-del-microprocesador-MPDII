@@ -19,6 +19,12 @@
 --   banco      -> entrada B de la ALU
 --   ALU -> desplazador ;  ambos regresan al MUX_Y
 --
+-- SENALES DE PRUEBA
+--   Los puertos TEST_* sacan al exterior los nodos internos de la ruta de datos
+--   para poder seguir el movimiento de la informacion instruccion por
+--   instruccion, tanto en simulacion como con un analizador logico.  Son
+--   puramente observacionales: no alimentan nada dentro del procesador.
+--
 -- NOTA SOBRE RF_Addr
 --   El numero de registro vive en IR[3:0], dentro de esta unidad, pero la
 --   senal RF_Addr es un puerto de control.  Por eso IR[3:0] sale hacia la
@@ -60,7 +66,17 @@ entity datapath is
         COP         : out std_logic_vector(4 downto 0);  -- IR[12:8]
         IR_low      : out std_logic_vector(3 downto 0);  -- IR[3:0]
         Zero_dp     : out std_logic;
-        Positive_dp : out std_logic
+        Positive_dp : out std_logic;
+        ----------------------------------------------------------------------
+        -- Senales de prueba  (solo observacion, no afectan el funcionamiento)
+        ----------------------------------------------------------------------
+        TEST_PC      : out std_logic_vector(7 downto 0);   -- salida del contador de programa
+        TEST_ROM     : out std_logic_vector(12 downto 0);  -- palabra leida de la ROM
+        TEST_Mux_dp  : out std_logic_vector(7 downto 0);   -- BUS Y: salida del MUX_Y
+        TEST_Acc     : out std_logic_vector(7 downto 0);   -- salida del acumulador
+        TEST_RF      : out std_logic_vector(7 downto 0);   -- salida del banco de registros
+        TEST_ALU     : out std_logic_vector(7 downto 0);   -- salida de la ALU
+        TEST_Shifter : out std_logic_vector(7 downto 0)    -- salida del desplazador
     );
 end entity datapath;
 
@@ -222,5 +238,18 @@ begin
     -- Banderas tomadas de la salida del acumulador
     U_FLAGS : flags
         port map (d => s_acc_q, zero => Zero_dp, positiv => Positive_dp);
+
+    ----------------------------------------------------------------------------
+    -- SALIDAS DE PRUEBA
+    --   Copias directas de los nodos internos.  Al ser puertos de salida,
+    --   la sintesis conserva los nodos y permite observarlos en la tarjeta.
+    ----------------------------------------------------------------------------
+    TEST_PC      <= s_pc_q;    -- direccion de la instruccion en curso
+    TEST_ROM     <= s_rom_q;   -- instruccion que la ROM entrega en esa direccion
+    TEST_Mux_dp  <= s_busy;    -- dato que circula por el BUS Y
+    TEST_Acc     <= s_acc_q;   -- contenido del acumulador
+    TEST_RF      <= s_rf_q;    -- registro seleccionado por RF_Addr
+    TEST_ALU     <= s_alu_y;   -- resultado de la operacion aritmetico-logica
+    TEST_Shifter <= s_sh_y;    -- resultado tras el desplazador
 
 end architecture structural;

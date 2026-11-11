@@ -42,6 +42,12 @@
 --
 -- Traza esperada:  15-3=12 (R3=1), 12-3=9 (2), 9-3=6 (3), 6-3=3 (4),
 --                  3-3=0 (5), 0-3=-3 < 0 -> salir.   Resultado = 5.
+--
+-- PARA CAMBIAR EL DIVISOR basta con reescribir la palabra de la direccion 02,
+-- que es la constante que se guarda en R2.  Por ejemplo, para 15 / 5 = 3:
+--      2 => "0000100000101",   -- LDI 5   (00001 00000101 = 0x105)
+-- y actualizar el valor esperado en sim/tb_MPDII.vhd.  Esa variante se
+-- verifico con GHDL: entrega OUT_dp = 3 en t = 2630 ns.
 --------------------------------------------------------------------------------
 
 library ieee;

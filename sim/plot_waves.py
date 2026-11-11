@@ -135,6 +135,13 @@ r3 = [(t, r[3]) for t, r in hist]
 r1 = [(0, 0)] + r1
 r3 = [(0, 0)] + r3
 
+_vals = [v for _, v in r1]
+DIVIDENDO = max(_vals) if _vals else 0
+_difs = [a - b for a, b in zip(_vals, _vals[1:]) if a - b > 0]
+DIVISOR = min(_difs) if _difs else 1
+COCIENTE = r3[-1][1] if r3 else 0
+NEG = (256 - DIVISOR) % 256
+
 ESTADOS = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10']
 
 
@@ -208,9 +215,9 @@ def anotar_cambios(ax, data, color):
 
 anotar_cambios(axs[0], r1, DATA)
 anotar_cambios(axs[1], r3, CTRL)
-t_neg = next((tt for tt, v in acc if v == 253), None)
+t_neg = next((tt for tt, v in acc if v is not None and v == NEG), None)
 if t_neg:
-    axs[2].annotate('0 - 3 = -3\n0xFD en complemento a dos', (t_neg, 253),
+    axs[2].annotate(f'0 - {DIVISOR} = -{DIVISOR}\n0x{NEG:02X} en complemento a dos', (t_neg, NEG),
                     textcoords='offset points', xytext=(-210, -14), fontsize=9.5,
                     color=STAT, fontweight='bold',
                     arrowprops=dict(arrowstyle='->', color=STAT, lw=1.4))
@@ -222,10 +229,11 @@ if t_neg:
 for a in axs[:3]:
     a.margins(y=.3)
 
-fig.suptitle('Figura 2 · Division por restas sucesivas — 15 / 3',
+fig.suptitle(f'Figura 2 · Division por restas sucesivas — {DIVIDENDO} / {DIVISOR} = {COCIENTE}',
              fontsize=14, fontweight='bold', color=INK, x=.09, ha='left', y=.975)
-fig.text(.09, .935, 'El dividendo R1 baja de 3 en 3 mientras el cociente R3 cuenta las restas; '
-                    'Positive_dp cae cuando la resta se vuelve negativa y termina el bucle',
+fig.text(.09, .935, f'El dividendo R1 baja de {DIVISOR} en {DIVISOR} mientras el cociente R3 '
+                    'cuenta las restas; Positive_dp cae cuando la resta se vuelve negativa '
+                    'y termina el bucle',
          fontsize=10, color=MUTED, ha='left')
 fig.tight_layout(rect=[0, 0, 1, .92])
 fig.savefig('../../sim_fig2.png', dpi=130, facecolor='white')
@@ -255,10 +263,11 @@ xs.append(T1 + 50); ys.append(ys[-1] if ys else 0)
 axs[4].step(xs, ys, where='post', color=STAT, lw=2.4)
 frame(axs[4], T0, T1, 'OUT_dp')
 axs[4].set_xlabel('tiempo [ns]', fontsize=10, color=MUTED)
-axs[4].set_ylim(-2.5, 7)
-axs[4].set_yticks([-1, 0, 5]); axs[4].set_yticklabels(['Z', '0', '5'])
-axs[4].axhline(5, color=STAT, lw=.8, ls='--', alpha=.5)
-axs[4].annotate('resultado = 5', (tout, 5), textcoords='offset points', xytext=(14, 6),
+axs[4].set_ylim(-2.5, COCIENTE + 2)
+axs[4].set_yticks([-1, 0, COCIENTE])
+axs[4].set_yticklabels(['Z', '0', str(COCIENTE)])
+axs[4].axhline(COCIENTE, color=STAT, lw=.8, ls='--', alpha=.5)
+axs[4].annotate(f'resultado = {COCIENTE}', (tout, COCIENTE), textcoords='offset points', xytext=(14, 6),
                 fontsize=11, color=STAT, fontweight='bold')
 for a in axs:
     a.axvspan(tout, tout + 20, color='#FDF2DC', zorder=0)

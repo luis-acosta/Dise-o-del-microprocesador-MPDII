@@ -17,6 +17,13 @@
 -- Puertos del sistema: clk y reset llegan a los dos bloques; Input_dp y
 -- OUT_dp pertenecen a la unidad de datos, que es la que habla con el exterior.
 --
+-- SENALES DE PRUEBA
+--   Los diez puertos TEST_* permiten seguir el movimiento de los datos dentro
+--   del microprocesador sin abrir la jerarquia: siete vienen de nodos internos
+--   de la unidad de datos y tres son copias de senales que ya cruzan entre las
+--   dos unidades (COP, Zero_dp y OUT_En).  No alimentan ninguna logica, asi
+--   que se pueden dejar sin conectar en la tarjeta sin alterar el diseno.
+--
 -- OUT_dp proviene de un buffer triestado: solo es valido mientras la unidad
 -- de control mantiene OUT_En = '1' (estado S4).  Fuera de ese ciclo queda en
 -- alta impedancia.
@@ -30,7 +37,20 @@ entity MPDII is
         clk      : in  std_logic;
         reset    : in  std_logic;
         Input_dp : in  std_logic_vector(7 downto 0);
-        OUT_dp   : out std_logic_vector(7 downto 0)
+        OUT_dp   : out std_logic_vector(7 downto 0);
+        --------------------------------------------------------------------
+        -- SENALES DE PRUEBA  (observacion del interior del procesador)
+        --------------------------------------------------------------------
+        TEST_PC      : out std_logic_vector(7 downto 0);   -- contador de programa
+        TEST_ROM     : out std_logic_vector(12 downto 0);  -- salida de la ROM
+        TEST_COP     : out std_logic_vector(4 downto 0);   -- codigo de operacion IR[12:8]
+        TEST_Mux_dp  : out std_logic_vector(7 downto 0);   -- salida del MUX_Y (BUS Y)
+        TEST_Acc     : out std_logic_vector(7 downto 0);   -- salida del acumulador
+        TEST_RF      : out std_logic_vector(7 downto 0);   -- salida del banco de registros
+        TEST_ALU     : out std_logic_vector(7 downto 0);   -- salida de la ALU
+        TEST_Shifter : out std_logic_vector(7 downto 0);   -- salida del desplazador
+        TEST_Zero_dp : out std_logic;                      -- bandera de cero
+        TEST_OUT_En  : out std_logic                       -- habilitacion del buffer de salida
     );
 end entity MPDII;
 
@@ -74,7 +94,14 @@ architecture structural of MPDII is
               COP          : out std_logic_vector(4 downto 0);
               IR_low       : out std_logic_vector(3 downto 0);
               Zero_dp      : out std_logic;
-              Positive_dp  : out std_logic);
+              Positive_dp  : out std_logic;
+              TEST_PC      : out std_logic_vector(7 downto 0);
+              TEST_ROM     : out std_logic_vector(12 downto 0);
+              TEST_Mux_dp  : out std_logic_vector(7 downto 0);
+              TEST_Acc     : out std_logic_vector(7 downto 0);
+              TEST_RF      : out std_logic_vector(7 downto 0);
+              TEST_ALU     : out std_logic_vector(7 downto 0);
+              TEST_Shifter : out std_logic_vector(7 downto 0));
     end component;
 
     ----------------------------------------------------------------------------
@@ -145,6 +172,22 @@ begin
             COP         => s_COP,
             IR_low      => s_IR_low,
             Zero_dp     => s_Zero_dp,
-            Positive_dp => s_Positive_dp);
+            Positive_dp => s_Positive_dp,
+            -- observacion
+            TEST_PC      => TEST_PC,
+            TEST_ROM     => TEST_ROM,
+            TEST_Mux_dp  => TEST_Mux_dp,
+            TEST_Acc     => TEST_Acc,
+            TEST_RF      => TEST_RF,
+            TEST_ALU     => TEST_ALU,
+            TEST_Shifter => TEST_Shifter);
+
+    ----------------------------------------------------------------------------
+    -- Senales de prueba que ya cruzan entre las dos unidades: se copian al
+    -- exterior sin pasar por logica adicional.
+    ----------------------------------------------------------------------------
+    TEST_COP     <= s_COP;        -- que instruccion esta decodificando la UC
+    TEST_Zero_dp <= s_Zero_dp;    -- bandera que gobierna JZ y JNZ
+    TEST_OUT_En  <= c_OUT_En;     -- marca el ciclo en que OUT_dp es valido
 
 end architecture structural;
