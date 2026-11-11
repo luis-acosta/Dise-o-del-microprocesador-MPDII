@@ -4,6 +4,9 @@ Microprocesador didáctico de 8 bits descrito en VHDL, listo para abrir como
 proyecto de **Quartus II**. Incluye la unidad de datos, la unidad de control,
 un programa de prueba en la ROM y un banco de pruebas verificado.
 
+Página del proyecto (características, diagramas, código y simulación):
+**https://claude.ai/artifact/GBXXqLDZXWDjVDFSLgHFuY**
+
 ---
 
 ## Características
