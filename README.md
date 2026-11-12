@@ -4,8 +4,25 @@ Microprocesador didáctico de 8 bits descrito en VHDL, listo para abrir como
 proyecto de **Quartus II**. Incluye la unidad de datos, la unidad de control,
 un programa de prueba en la ROM y un banco de pruebas verificado.
 
-Página del proyecto (características, diagramas, código y simulación):
-**https://claude.ai/artifact/GBXXqLDZXWDjVDFSLgHFuY**
+## Página del proyecto
+
+La página completa —características, los cuatro planos, el juego de
+instrucciones, el código VHDL, los nueve programas y las gráficas de
+simulación— está en [`docs/index.html`](docs/index.html).
+
+Es un único archivo con todo embebido: los diagramas van como SVG en línea y
+las gráficas como imágenes en base64, así que se abre en cualquier navegador
+sin necesidad de red ni de archivos sueltos. Para regenerarla después de
+cambiar el VHDL o algún programa:
+
+```sh
+python3 docs/build_landing.py
+```
+
+El generador lee el código de `rtl/`, `sim/` y `programas/`, y los planos y
+gráficas de `doc/`. Las tablas de cada programa las extrae del propio
+`constant PROGRAMA` de cada ROM, de modo que no pueden quedar desfasadas
+respecto al código.
 
 ---
 
