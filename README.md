@@ -244,6 +244,54 @@ deja el procesador permanentemente en reset.
 
 ---
 
+## Programas
+
+La carpeta [`programas/`](programas/) trae nueve programas, cada uno como una
+versión completa de `rom256x13.vhd`. Se dividen en dos grupos:
+
+**Pruebas del microprocesador** — autodiagnósticos que ejercitan cada unidad y
+avisan por la salida si algo falla:
+
+| Programa | Qué comprueba |
+|---|---|
+| `rom256x13_saltos.vhd` | `JMP`, `JZ`, `JNZ`, `JP`, `JN`, cada uno en sus dos casos |
+| `rom256x13_alu.vhd` | Las ocho operaciones, con desbordamiento y complemento a dos |
+| `rom256x13_es.vhd` | `IN` y `OUT` con patrones de bits complementarios |
+
+**Aplicaciones** — división, suma, rotación de un bit, comparación y dos
+multiplicadores, uno por sumas sucesivas y otro de desplazar y sumar con
+resultado de 16 bits.
+
+Para verificar los nueve de una vez:
+
+```sh
+cd programas
+sh verificar_todo.sh
+```
+
+```
+PRUEBAS DEL MICROPROCESADOR
+  OK     saltos          JMP JZ JNZ JP JN
+  OK     ALU             las 8 operaciones
+  OK     entrada/salida  IN y OUT
+
+APLICACIONES
+  OK     division        15 / 3 = 5
+  OK     suma            25 + 17 = 42
+  OK     rotacion        un 1 por 8 posiciones
+  OK     mayor           comparacion
+  OK     multiplicacion  sumas sucesivas
+  OK     mult 16 bits    desplazar y sumar
+
+Los nueve programas pasaron.
+```
+
+`programas/ensamblador.py` traduce mnemónicos y etiquetas a la constante
+`PROGRAMA` resolviendo las direcciones de salto solo; ver
+[`programas/README.md`](programas/README.md).
+
+---
+
 ## Simulación
 
 ### Con ModelSim-Altera (desde Quartus II)
